@@ -1,0 +1,26 @@
+---
+version: 0.5
+env:
+networks:
+  remote:
+    hosts:
+    - root@10.10.10.10 | password123 > custom_tube
+commands:
+  test-upload:
+    desc: testing upload
+    upload:
+    - src: /Users/k.pechenenko/Downloads/iso/Win11_Russian_x64_vmtools.iso
+      dst: ~/monorepo-master
+    run: ls -al ~/monorepo-master
+  foobar_command:
+    desc: |
+      long description of the command
+      across multiple lines
+    run: echo "Hello World!"
+targets:
+  target1:
+  - test-upload remote
+  - foobar_command remote
+  target2:
+  - test-upload remote
+  - foobar_command remote
