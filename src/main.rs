@@ -53,19 +53,12 @@ fn main() {
             println!("No commands found for this play");
         }
 
-        // dbg!(commands);
-        // dbg!(networks);
-        // dbg!(is_makefile_mode);
+        dbg!(commands);
+        dbg!(networks);
+        dbg!(is_makefile_mode);
 
 
     } // end of for play in playbook
 
-
-
-    // let mut help_displayer = HelpDisplayer::new(start_state.clone());
-    // help_displayer.show_cmd = true;
-    // help_displayer.show_networks = true;
-    // help_displayer.show_targets = true;
-    // help_displayer.show(&start_state.clone());
     l.log("end of main");
 }

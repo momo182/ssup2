@@ -5,7 +5,7 @@ use crate::gateways::logger::Logger;
 use crate::entity::playbook::{PlayBook,Play};
 use crate::usecase::env_parser::parse_env;
 use crate::usecase::{ensure_network_exists,override_env_from_args,add_ssup_default_envs};
-use crate::usecase::parse_network::parse_inventory;
+use crate::usecase::inventory_tools::parse_inventory;
 
 #[allow(dead_code)]
 /// Parses the initial arguments and constructs a playbook.

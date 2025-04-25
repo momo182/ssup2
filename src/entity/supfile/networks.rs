@@ -1,7 +1,7 @@
 use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::{hash_map, HashMap};
 use std::fmt::{self};
-use crate::usecase::parse_network::check_hosts_form;
+use crate::usecase::inventory_tools::check_hosts_form;
 
 
 

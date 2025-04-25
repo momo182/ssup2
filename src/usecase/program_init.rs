@@ -94,6 +94,13 @@ pub fn parse_initial_args(init_data: &mut InitState) -> PlayBook {
 
     l.log(format!("Checking if we have any args at all, len: {}", args_count).as_str());
 
+    if args_count == 0 {
+        l.log("No args");
+        help_menu.show_all(init_data);
+        println!("Usage: ssup [OPTIONS] NETWORK COMMAND [...]\n       ssup [ --help | -v | --version ]");
+        std::process::exit(2);
+    }
+
     if !conf.networks.is_empty() {
         if all_args_are_targets(&init_data) {
             l.log("Special target mode");
