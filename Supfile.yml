@@ -17,6 +17,12 @@ commands:
       long description of the command
       across multiple lines
     run: echo "Hello World!"
+  test:
+    desc: |
+      just a test
+      with multiline description
+    local: |
+      id -u
 targets:
   target1:
   - test-upload remote

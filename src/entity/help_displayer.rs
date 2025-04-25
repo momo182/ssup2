@@ -1,7 +1,7 @@
 use std::process::Command as OsCmd; 
 use super::supfile::Supfile;
 use super::InitState;
-use crate::gateways::logger::logger_func as l;
+use crate::gateways::logger::Logger;
 
 pub struct HelpDisplayer {
     pub show_networks: bool,
@@ -63,11 +63,13 @@ impl HelpDisplayer {
     }
 
     fn target_usage(&self, conf: &Supfile) {
+        let l = Logger::new("entity::help_displayer::target_usage");
         println!("Targets:");
         let targets = conf.targets.clone();
         let target_names = targets.names;
         for target_name in target_names {
-            l(format!("getting affix for target name: {}", target_name).as_str());
+            l.log(format!("getting affix for target name: {}", target_name).as_str());
+            println!("  - {}:", target_name);
             let affixed_targets = match targets.targets.get(&target_name) {
                 Some(affixed_targets) => {
                     affixed_targets.clone()
@@ -78,7 +80,7 @@ impl HelpDisplayer {
             };
 
             for affixed_target in affixed_targets {
-                println!("- {} -> {}", affixed_target.command, affixed_target.affixed_network);
+                println!("    - {} -> {}", affixed_target.command, affixed_target.affixed_network);
             }
 
         }
@@ -92,7 +94,7 @@ impl HelpDisplayer {
         let cmd_names = conf.commands.keys();
         for name in cmd_names {
             if let Some(cmd) = conf.commands.get(name) {
-                println!("- {}: {}", name, cmd);
+                println!("  - {}: {}", name, cmd);
             }
         }
     }
@@ -102,11 +104,11 @@ impl HelpDisplayer {
         let networks = conf.networks.clone();
         let net_names = networks.nets.keys();
         for name in net_names {
-            println!("- {}", name);
+            println!("  - {}:", name);
             if let Some(network) = networks.get(name) {
                 let hosts = &network.hosts;
                     for host in hosts {
-                        println!("  - {}", host);
+                        println!("    - {}", host);
                     }
             }
         }

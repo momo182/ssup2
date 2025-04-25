@@ -25,7 +25,10 @@ pub struct CommandLineArgs {
     #[arg( long = "except", required = false, default_value = "")]
     pub excepthosts: String,
     #[arg( long = "only", required = false, default_value = "")]
-    pub onlyhosts: String
+    pub onlyhosts: String,
+    // Добавляем поле для произвольных аргументов
+    #[arg(trailing_var_arg = true)]
+    pub extra_args: Vec<String>,
 }
 
 

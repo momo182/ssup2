@@ -1,17 +1,8 @@
+use indexmap::IndexMap;
 use serde::{Deserialize, Deserializer};
-use serde_yaml::{self, Mapping, Value};
-use std::collections::HashMap;
+use serde_yaml::{self, Value};
 use std::fmt;
 
-use super::networks::Network;
-
-// #[derive(Debug, Deserialize, Clone)]
-// #[derive(serde::Serialize)]
-// pub struct AffixMapping {
-//     pub target_name: String,
-//     pub affixed_network: String,
-//     pub command_name: String,
-// }
 
 #[derive(Debug, Deserialize, Clone)]
 #[derive(serde::Serialize)]
@@ -24,7 +15,7 @@ pub struct Target {
 #[derive(serde::Serialize)]
 pub struct Targets {
     pub names: Vec<String>,
-    pub targets: HashMap<String, Vec<Target>>,
+    pub targets: IndexMap<String, Vec<Target>>,
 }
 
 impl<'de> Deserialize<'de> for Targets {
@@ -35,11 +26,11 @@ impl<'de> Deserialize<'de> for Targets {
         let value: Value = Deserialize::deserialize(deserializer)?;
         // dbg!(value.clone());
 
-        let targets_tpl: HashMap<String, Vec<String>> =
+        let targets_tpl: IndexMap<String, Vec<String>> =
             serde_yaml::from_value(value.clone()).map_err(serde::de::Error::custom)?;
 
         let mut names = Vec::with_capacity(targets_tpl.len());
-        let mut targets_final = HashMap::<String, Vec<Target>>::new();
+        let mut targets_final = IndexMap::<String, Vec<Target>>::new();
         
         // targets
         for (key, lines) in targets_tpl.clone() {
@@ -74,7 +65,7 @@ impl<'de> Deserialize<'de> for Targets {
                     std::process::exit(2);
                 }
 
-                targets_generated.insert(0, mapping);
+                targets_generated.push(mapping);
             } // dns lines
             targets_final.insert(key, targets_generated);
         } // end targets
@@ -92,7 +83,7 @@ impl Targets {
     pub fn get(&self, name: &str) -> Vec<Target> {
         let result = match self.targets.get(name) {
             None => {
-                println!("no target found");
+                println!("4E4AA530-1D57-4517-9915-1ED15B3EE923: no target found");
                 std::process::exit(1);
             },
             Some(target) => target.clone(),

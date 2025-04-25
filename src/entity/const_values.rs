@@ -4,7 +4,7 @@ pub const CSUP_DO_SUDO_ENV: &str = "SUP_SUDO";
 
 // Separator constants
 pub const PASS_SEPARATOR: &str = " | ";
-pub const TUBE_NAME_SEPARATOR: &str = " << ";
+pub const TUBE_NAME_SEPARATOR: &str = " > ";
 
 // Other constants
 pub const MAIN_SCRIPT: &str = "_ssup_run";

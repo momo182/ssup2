@@ -7,12 +7,13 @@ use std::path::PathBuf;
 use log::info;
 use crate::entity::{InitState, playbook::PlayBook};
 use crate::usecase::modes_of_operation::{special_target_mode::special_target_mode, normal_mode::normal_mode, makefile_mode::makefile_mode};
-use crate::gateways::logger::logger_func as l;
+use crate::gateways::logger::Logger;
 
 pub fn parse_supfile(args: CommandLineArgs) -> supfile::Supfile {
+    let l = Logger::new("uc::program_init::parse_supfile");
     let mut file_to_read: std::path::PathBuf;
     let start_dir = env::current_dir().expect("failed to get current dir");
-    l(&format!("supfile parsing started in folder: {:?}", start_dir));
+    l.log(&format!("supfile parsing started in folder: {:?}", start_dir));
 
     if args.file == "" {
         file_to_read = std::path::PathBuf::from(".".to_string());
@@ -60,6 +61,7 @@ pub fn parse_supfile(args: CommandLineArgs) -> supfile::Supfile {
         // println!("cd done");
     }
 
+    l.log("done parsing supfile");
     return serde_yaml::from_str(&content).expect(format!("could not parse file: {}", file_to_read.display()).as_str());
 
 }
@@ -84,43 +86,46 @@ fn usage_on_no_args(init_data: InitState) {
 
 
 pub fn parse_initial_args(init_data: &mut InitState) -> PlayBook {
+    let l = Logger::new("uc::program_init::parse_initial_args");
     let conf = init_data.supfile.clone();
     let args = &init_data.args;
     let args_count = args.len();
     let mut help_menu = HelpDisplayer::new(init_data.clone());
 
-    info!("Checking if we have any args at all, len: {}", args_count);
+    l.log(format!("Checking if we have any args at all, len: {}", args_count).as_str());
 
-    if conf.networks.is_empty() {
-        if all_args_are_targets(&init_data, &mut help_menu) {
-            info!("Special target mode");
+    if !conf.networks.is_empty() {
+        if all_args_are_targets(&init_data) {
+            l.log("Special target mode");
             return special_target_mode(&init_data, &mut help_menu);
         }
         
-        info!("Normal mode");
+        l.log("Normal mode");
         return normal_mode(&init_data, &help_menu);
     }
 
-    info!("Makefile mode");
+    l.log("Makefile mode");
     makefile_mode(init_data, &mut help_menu)
 }
 
-fn all_args_are_targets(init_data: &InitState, help_menu: &mut HelpDisplayer) -> bool {
+fn all_args_are_targets(init_data: &InitState) -> bool {
+    let l = Logger::new("uc::program_init::all_args_are_targets");
     let conf = &init_data.supfile;
     let args = &init_data.args;
-    let mut no_missing_names = true;
     
-    info!("Checking if all given args are targets: {}", args.len());
+    l.log(format!("Checking if all given args are targets: {}", args.len()));
     
     let targets = conf.targets.clone();
 
     for single_argument in args {
+        l.log(format!("Targets check -> checking {}", single_argument).as_str());
         if !targets.has(single_argument) {
-            info!("Targets check -> unknown keyword: {}", single_argument);
-            no_missing_names = false;
-            help_menu.show_all(&init_data);
+            l.log(format!("Targets check -> unknown keyword: {}", single_argument));
+            return false;
+        } else {
+            l.log(format!("Targets check -> keyword found: {}", single_argument));
         }
     }
     
-    no_missing_names
+    true
 }

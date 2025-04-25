@@ -6,6 +6,7 @@ use crate::entity::supfile::targets::Targets;
 use networks::Networks;
 use serde::{Deserialize, Serialize, Deserializer};
 use std::collections::HashMap;
+use indexmap::IndexMap;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct Supfile {
@@ -50,7 +51,7 @@ impl<'de> Deserialize<'de> for Supfile {
 
         let null_targets = Targets {
             names: vec![],
-            targets: HashMap::new(),
+            targets: IndexMap::new(),
         };
 
         Ok(Supfile {

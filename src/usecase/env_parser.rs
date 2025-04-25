@@ -1,9 +1,26 @@
 use std::collections::HashMap;
 
-pub fn parse_env(s: &str) -> HashMap<String, String> {
+use crate::gateways::logger::Logger;
+
+
+pub fn parse_env(s: &str) -> Option<HashMap<String, String>> {
+    let l = Logger::new("uc::env_parser::parse_env");
+    l.log("will check if string is empty");
+    if s.is_empty() {
+        l.log("string indeed is empty");
+        return None;
+    }
+
+    l.log("will create empty HashMap");
     let mut result: HashMap<String, String> = HashMap::new();
+
+    // check if string is empty
+
     // split on spaces
+    l.log("will split on spaces");
+    l.log(format!("string to split: {:?}", s.split(" ")));
     for elem in s.split(" ") {
+        l.log(format!("inspecting elem: {:?}", elem));
         // get the key and value from the env variable
         let mut key_val = elem.split("=");
         let key = key_val.next().unwrap().to_string();
@@ -11,5 +28,5 @@ pub fn parse_env(s: &str) -> HashMap<String, String> {
         // add the key and value to the HashMap
         result.insert(key, val);
     }
-    return result;
+    return Some(result);
 }

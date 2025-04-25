@@ -1,8 +1,10 @@
 use std::env::args;
 
 use crate::usecase::program_init;
-use crate::entity::help_displayer::HelpDisplayer;
 use clap::Parser;
+use entity::playbook;
+use gateways::logger::Logger;
+use usecase::program_init::parse_initial_args;
 mod entity;
 mod usecase;
 mod gateways;
@@ -14,12 +16,18 @@ fn process_flags() -> entity::CommandLineArgs {
 
 
 fn main() {
+    let l = Logger::new("main");
     // collect arguments into a vector
-    let args: Vec<String> = args().collect();
+    let mut args: Vec<String> = args().collect();
+
+    _ = args.remove(0);
+    l.log(format!("drop binary name from args: {:?}", &args));
+
     let flags = process_flags();
     // println!("args are {:?}", &args);
+    l.log("reading supfile");
     let supfile = program_init::parse_supfile(flags.clone());
-    dbg!(supfile.clone());
+    // dbg!(supfile.clone());
 
     // find full path to supfile
     let start_state = entity::InitState{
@@ -28,10 +36,36 @@ fn main() {
         flags: flags,
         make_mode: false,
     };
-    let mut help_displayer = HelpDisplayer::new(start_state.clone());
-    help_displayer.show_cmd = true;
-    help_displayer.show_networks = true;
-    help_displayer.show_targets = true;
-    help_displayer.show(&start_state.clone());
-    
+    l.log("finished reading supfile");
+    l.log("getting a playbook");
+    let playbook: playbook::PlayBook = parse_initial_args(&mut start_state.clone());
+    let is_makefile_mode = playbook.is_makefile;
+
+    for play in playbook.get_plays() {
+        let networks = play.nets.clone();
+        let commands = play.commands.clone();
+
+        // negative checks here
+        if networks.len() == 0 {
+            println!("No networks found for this play");
+        } 
+        if commands.len() == 0 {
+            println!("No commands found for this play");
+        }
+
+        // dbg!(commands);
+        // dbg!(networks);
+        // dbg!(is_makefile_mode);
+
+
+    } // end of for play in playbook
+
+
+
+    // let mut help_displayer = HelpDisplayer::new(start_state.clone());
+    // help_displayer.show_cmd = true;
+    // help_displayer.show_networks = true;
+    // help_displayer.show_targets = true;
+    // help_displayer.show(&start_state.clone());
+    l.log("end of main");
 }
