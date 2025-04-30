@@ -55,7 +55,7 @@ pub fn normal_mode(init_data: &InitState, help_menu: &HelpDisplayer) -> PlayBook
     add_ssup_default_envs(&mut network, &init_data);
 
     let mut play = Play {
-        nets: vec![network],
+        network: network,
         commands: Vec::new(),
     };
 

@@ -1,5 +1,6 @@
 use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::{hash_map, HashMap};
+use std::default;
 use std::fmt::{self};
 use crate::usecase::inventory_tools::check_hosts_form;
 
@@ -11,7 +12,7 @@ pub struct Networks {
     pub nets: HashMap<String, Network>
 }
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct Network {
     pub hosts: Vec<Host>,
     pub env: HashMap<String, String>,
@@ -57,7 +58,7 @@ pub enum HostEntry {
 
 
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Host {
     pub host: String,
     pub user: Option<String>,
@@ -72,7 +73,7 @@ impl Host {
     #[allow(unused_imports)]
     #[allow(dead_code)]
     pub fn new(host: String) -> Host {
-        Host { host, user: None, pass: None, tube: None, env: None, sudo: false }
+        Host { host, ..Default::default() }
     }
 }
 

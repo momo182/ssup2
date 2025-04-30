@@ -4,7 +4,8 @@ use crate::usecase::program_init;
 use clap::Parser;
 use entity::playbook;
 use gateways::logger::Logger;
-use usecase::program_init::parse_initial_args;
+use gateways::shellcheck::run_shellcheck;
+use usecase::program_init::{check_additional_flags, parse_initial_args};
 mod entity;
 mod usecase;
 mod gateways;
@@ -27,34 +28,33 @@ fn main() {
     // println!("args are {:?}", &args);
     l.log("reading supfile");
     let supfile = program_init::parse_supfile(flags.clone());
-    // dbg!(supfile.clone());
-
-    // find full path to supfile
-    let start_state = entity::InitState{
+    let mut init_state: entity::InitState = entity::InitState{
         args: args,
         supfile: supfile,
         flags: flags,
         make_mode: false,
     };
+
     l.log("finished reading supfile");
     l.log("getting a playbook");
-    let playbook: playbook::PlayBook = parse_initial_args(&mut start_state.clone());
+    let playbook: playbook::PlayBook = parse_initial_args(&mut init_state.clone());
     let is_makefile_mode = playbook.is_makefile;
 
     for play in playbook.get_plays() {
-        let networks = play.nets.clone();
+        let mut network = play.network.clone();
         let commands = play.commands.clone();
 
         // negative checks here
-        if networks.len() == 0 {
-            println!("No networks found for this play");
-        } 
         if commands.len() == 0 {
             println!("No commands found for this play");
         }
 
+        check_additional_flags(&mut network, &mut init_state);
+        run_shellcheck(init_state.clone());
+        
+
         dbg!(commands);
-        dbg!(networks);
+        dbg!(network);
         dbg!(is_makefile_mode);
 
 

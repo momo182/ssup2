@@ -14,6 +14,7 @@ pub struct Command {
     pub fetch: FetchEntry,
     pub env: HashMap<String, String>, 
     pub local: String,
+    pub script: String,
     pub stdin: bool,
     #[serde(skip)]
     pub name: String,
@@ -27,6 +28,7 @@ struct CommandOptionalMode {
     pub fetch: Option<FetchEntry>,
     pub env: Option<HashMap<String, String>>, 
     pub local: Option<String>,
+    pub script: Option<String>,
     pub stdin: Option<bool>,
     #[serde(skip)]
     pub name: Option<String>,
@@ -59,6 +61,7 @@ impl<'de> Deserialize<'de> for Command {
             },
             env: HashMap::new(),
             local: String::from(""),
+            script: String::from(""),
             stdin: false,
             name: String::from(""),
         };
@@ -86,6 +89,10 @@ impl<'de> Deserialize<'de> for Command {
 
         if let Some(local) = command_template.local {
             command_final.local = local;
+        }
+
+        if let Some(script) = command_template.script {
+            command_final.script = script;
         }
 
         if let Some(stdin) = command_template.stdin {

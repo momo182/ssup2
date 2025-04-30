@@ -1,4 +1,5 @@
 pub mod program_init;
+pub mod ssh_config_parser;
 pub mod modes_of_operation;
 pub mod env_parser;
 pub mod network_host_utils;
@@ -7,7 +8,7 @@ use std::collections::HashMap;
 use std::{env, vec};
 use chrono::Utc;
 use crate::entity::help_displayer::HelpDisplayer;
-use crate::entity::supfile::networks::{Host, HostEntry, Network, Networks};
+use crate::entity::supfile::networks::{Network, Networks};
 use crate::entity::InitState;
 use crate::gateways::logger::Logger;
 use crate::usecase::inventory_tools::check_hosts_form;

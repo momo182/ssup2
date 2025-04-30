@@ -24,36 +24,22 @@ impl PlayBook {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Play {
-    pub nets: Vec<Network>,
+    pub network: Network,
     pub commands: Vec<Command>,
 }
 
 impl Play {
     pub fn new() -> Self {
         Self {
-            nets: Vec::new(),
+            network: Network::default(),
             commands: Vec::new(),
         }
     }
 
-    pub fn add_net(&mut self, nets: Network) {
-        if self.nets.is_empty() {
-            self.nets.push(nets);
-        } else {
-            // checking for duplicate nets
-            let mut exist = false;
-            for net in self.nets.iter() {
-                if net.name == nets.name {
-                    exist = true;
-                    break;
-                }
-            }
-            if !exist {
-                self.nets.push(nets);
-            }
-        }
+    pub fn add_net(&mut self, network: Network) {
+        self.network = network;
     }
 
     pub fn add_command(&mut self, command: Command) {
