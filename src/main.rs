@@ -5,7 +5,7 @@ use clap::Parser;
 use entity::playbook;
 use gateways::logger::Logger;
 use gateways::shellcheck::run_shellcheck;
-use usecase::program_init::{check_additional_flags, parse_initial_args};
+use usecase::program_init::{check_additional_flags, parse_initial_args, merge_vars};
 mod entity;
 mod usecase;
 mod gateways;
@@ -49,9 +49,9 @@ fn main() {
             println!("No commands found for this play");
         }
 
-        check_additional_flags(&mut network, &mut init_state);
         run_shellcheck(init_state.clone());
-        
+        check_additional_flags(&mut network, &mut init_state);
+        let merged_vars = merge_vars(&mut network, &mut init_state);
 
         dbg!(commands);
         dbg!(network);

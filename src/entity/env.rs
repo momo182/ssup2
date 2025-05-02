@@ -2,6 +2,7 @@ use indexmap::IndexMap; // Use IndexMap to preserve insertion order from YAML
 use serde::Deserialize;
 use std::fmt;
 use crate::gateways::logger::Logger;
+use crate::usecase::inventory_tools::{resolve_shell,is_shell};
 
 /// Represents an environment variable key-value pair.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)] // Added common derives
@@ -42,7 +43,6 @@ impl EnvVar {
 #[serde(transparent)] // Deserialize directly into the 'store' field
 pub struct EnvList {
     // Use IndexMap<String, String> to preserve insertion order.
-    // If order doesn't matter after parsing, std::collections::HashMap is fine.
     store: IndexMap<String, String>,
 }
 
@@ -124,7 +124,34 @@ impl EnvList {
     pub fn is_empty(&self) -> bool {
         self.store.is_empty()
     }
+
+    /// Resolves all environment variables that contain shell syntax in their values
+    /// and updates them in-place.
+    pub fn resolve_all(&mut self) {
+        let l = Logger::new("entity::env::resolve_all");
+        l.log("resolving values in env list");
+        let store = &mut self.store;
+        for (key, value) in store.clone().iter() {
+            l.log(format!("Resolving ${} = {}", key, value).as_str());
+            if is_shell(value) {
+                l.log(format!("Found shell syntax in ${}", key).as_str());
+                let resolved = match resolve_shell(value) {
+                    Ok(resolved) => {
+                        l.log(format!("Resolved ${} = {}", key, resolved).as_str());
+                        resolved
+                    },
+                    Err(e) => {
+                        l.log(format!("Error resolving ${}: {}", key, e).as_str());
+                        std::process::exit(1);
+                    }
+                };
+                store.swap_remove(key);
+                store.insert(key.clone(), resolved);
+            }
+        } 
+    }
 }
+
 
 // Example Usage (typically in main.rs or tests)
 /*
@@ -233,4 +260,5 @@ mod tests {
             let keys = list.keys_owned();
             assert_eq!(keys, vec!["FIRST".to_string(), "SECOND".to_string()]);
         }
-    }
+}
+    

@@ -2,6 +2,7 @@ use crate::entity::supfile;
 use crate::entity::help_displayer::HelpDisplayer;
 use crate::entity::supfile::networks::{Host, Network};
 use crate::entity::CommandLineArgs;
+use crate::entity::env::EnvList;
 use crate::usecase::ssh_config_parser::{must_parse_ssh_config, SSHHost};
 use std::collections::HashMap;
 use std::env;
@@ -11,7 +12,6 @@ use crate::entity::{InitState, playbook::PlayBook};
 use crate::usecase::modes_of_operation::{special_target_mode::special_target_mode, normal_mode::normal_mode, makefile_mode::makefile_mode};
 use crate::gateways::logger::Logger;
 use regex::Regex;
-
 use super::inventory_tools::resolve_path;
 
 
@@ -276,4 +276,23 @@ pub fn process_exclude_flags(selected_network: &mut Network, init_data: &mut Ini
 
     // Update the network's hosts with the filtered list
     selected_network.hosts = filtered_hosts;
+}
+
+pub fn merge_vars(selected_network: &mut Network, init_data: &mut InitState) {
+    let l = Logger::new("uc::program_init::merge_vars");
+    
+    let mut merged_vars: EnvList = Default::default();
+    l.log("copying vars from supfile");
+    for (key, value) in &init_data.supfile.env {
+        merged_vars.set(key.into(), value.into());
+    }
+
+    l.log("copying vars from network");
+    for (key, value) in &selected_network.env {
+        merged_vars.set(key.into(), value.into());
+    }
+
+    l.log("resolving env vars via shell");
+    merged_vars.resolve_all();
+
 }
