@@ -296,3 +296,11 @@ pub fn merge_vars(selected_network: &mut Network, init_data: &mut InitState) {
     merged_vars.resolve_all();
 
 }
+
+/// set_env_values sets vars from env pairs inside the InitState.supfile,
+/// values there will be given as 'key=value'
+pub fn set_env_values(vars: EnvList, init_data: &mut InitState) {
+    let l = Logger::new("uc::program_init::set_env_values");
+    l.log("setting env vars");
+
+}

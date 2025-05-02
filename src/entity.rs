@@ -9,11 +9,12 @@ use clap::Parser;
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
 //&init_data.args.command_args;
+
 pub struct CommandLineArgs {
     #[arg(short = 'f', default_value = "", required = false)]
     pub file: String,
-    #[arg(short = 'e', long = "env", default_value = "", required = false)]
-    pub env: String,
+    #[arg(short = 'e', long = "env", required = false, value_parser, num_args = 1..)]
+    pub env: Vec<String>,
     #[arg(short = 'D', long = "debug", required = false, default_value = "false")]
     pub debug: bool,
     #[arg(long = "sshconfig", required = false, default_value = "")]
@@ -26,9 +27,23 @@ pub struct CommandLineArgs {
     pub excepthosts: String,
     #[arg( long = "only", required = false, default_value = "")]
     pub onlyhosts: String,
-    // Добавляем поле для произвольных аргументов
     #[arg(trailing_var_arg = true)]
     pub extra_args: Vec<String>,
+}
+
+impl CommandLineArgs {
+    pub fn parse_env(&self) -> std::collections::HashMap<String, String> {
+        self.env.iter()
+            .filter_map(|s| {
+                let parts: Vec<&str> = s.splitn(2, '=').collect();
+                if parts.len() == 2 {
+                    Some((parts[0].to_string(), parts[1].to_string()))
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
 }
 
 

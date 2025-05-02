@@ -1,7 +1,7 @@
 pub mod program_init;
 pub mod ssh_config_parser;
 pub mod modes_of_operation;
-pub mod env_parser;
+// pub mod env_parser;
 pub mod network_host_utils;
 pub mod inventory_tools;
 use std::collections::HashMap;
@@ -28,15 +28,8 @@ pub fn ensure_network_exists(network_name: &str, conf: &InitState, help_menu: &H
 #[allow(unused_imports)]
 #[allow(dead_code)]
 /// Overrides environment variables in the network with values from the given map.
-pub fn override_env_from_args(env_from_args: &Option<HashMap<String, String>>, network: &mut Network) {
+pub fn override_env_from_args(env_from_args: &HashMap<String, String>, network: &mut Network) {
     let l = Logger::new("uc::override_env_from_args");
-    if env_from_args.is_none() {
-        l.log("no env values were supplied, will add nothing...");
-        return;
-    }
-
-    let env_from_args = env_from_args.as_ref().unwrap();
-
     let mut env = network.env.clone();
     if !env.is_empty() {
         l.log(format!("overriding env variables with values from args: {:?}", &env_from_args));
@@ -44,7 +37,6 @@ pub fn override_env_from_args(env_from_args: &Option<HashMap<String, String>>, n
             env.insert(key.clone(), value.clone());
         }
     }
-
 }
 
 

@@ -1,14 +1,14 @@
-use std::env::args;
 
+mod entity;
+mod usecase;
+mod gateways;
+
+use std::env::args;
 use crate::usecase::program_init;
 use clap::Parser;
 use entity::playbook;
 use gateways::logger::Logger;
 use gateways::shellcheck::run_shellcheck;
-use usecase::program_init::{check_additional_flags, parse_initial_args, merge_vars};
-mod entity;
-mod usecase;
-mod gateways;
 
 fn process_flags() -> entity::CommandLineArgs {
     let args = entity::CommandLineArgs::parse();
@@ -24,7 +24,7 @@ fn main() {
     _ = args.remove(0);
     l.log(format!("drop binary name from args: {:?}", &args));
 
-    let flags = process_flags();
+    let flags: entity::CommandLineArgs = process_flags();
     // println!("args are {:?}", &args);
     l.log("reading supfile");
     let supfile = program_init::parse_supfile(flags.clone());
@@ -37,7 +37,7 @@ fn main() {
 
     l.log("finished reading supfile");
     l.log("getting a playbook");
-    let playbook: playbook::PlayBook = parse_initial_args(&mut init_state.clone());
+    let playbook: playbook::PlayBook = program_init::parse_initial_args(&mut init_state.clone());
     let is_makefile_mode = playbook.is_makefile;
 
     for play in playbook.get_plays() {
@@ -50,8 +50,8 @@ fn main() {
         }
 
         run_shellcheck(init_state.clone());
-        check_additional_flags(&mut network, &mut init_state);
-        let merged_vars = merge_vars(&mut network, &mut init_state);
+        program_init::check_additional_flags(&mut network, &mut init_state);
+        let merged_vars = program_init::merge_vars(&mut network, &mut init_state);
 
         dbg!(commands);
         dbg!(network);

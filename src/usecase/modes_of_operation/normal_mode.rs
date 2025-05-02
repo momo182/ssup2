@@ -3,7 +3,7 @@ use crate::entity::InitState;
 use std::process;
 use crate::gateways::logger::Logger;
 use crate::entity::playbook::{PlayBook,Play};
-use crate::usecase::env_parser::parse_env;
+// use crate::usecase::env_parser::parse_env; //TODO remove me
 use crate::usecase::{ensure_network_exists,override_env_from_args,add_ssup_default_envs};
 use crate::usecase::inventory_tools::parse_inventory;
 
@@ -27,7 +27,8 @@ pub fn normal_mode(init_data: &InitState, help_menu: &HelpDisplayer) -> PlayBook
     };
 
     l.log("parse CLI --env flag");
-    let env_from_args = parse_env(&init_data.flags.env);
+    // let env_from_args = parse_env(&init_data.flags.env);
+    let env_from_args = init_data.flags.parse_env();
     l.log(format!("env from args: {:?}", env_from_args));
     let mut args = init_data.args.clone();
 
